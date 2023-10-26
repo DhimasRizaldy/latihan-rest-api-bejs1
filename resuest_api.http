@@ -1,0 +1,40 @@
+### Register
+POST http://localhost:3000/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "email": "dtekchannel02@gmail.com",
+  "password": "dimas123",
+  "password_confirmation": "dimas123" 
+}
+
+### Login
+GET http://localhost:3000/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "dtekchannel02@gmail.com",
+  "password": "dimas123"
+}
+
+### Whoami
+GET http://localhost:3000/api/v1/auth/whoami
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNjk4MzI4ODUyfQ.QO7-Ex59nc4Dj8PyTWr1jfwfX_m14qlhDWy_pyHal_o
+
+### get detail user
+
+
+### update user
+
+
+### delete user
+
+
+### add profile
+
+
+
+### update profile
+
+
+### update picture profile
