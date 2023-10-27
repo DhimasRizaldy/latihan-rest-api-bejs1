@@ -8,6 +8,8 @@ module.exports = {
   imagekit: async (req, res, next) => {
     try {
       // 
+      const { userId, first_name, last_name, birth_date } = req.body;
+
       let strFile = req.file.buffer.toString('base64');
 
       let { url } = await imagekit.upload({
@@ -19,7 +21,7 @@ module.exports = {
         status: true,
         message: 'OK',
         error: null,
-        data: { file_url: url }
+        data: { userId, first_name, last_name, birth_date, profile_picture: url }
       })
 
     } catch (err) {
