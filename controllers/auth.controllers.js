@@ -98,5 +98,36 @@ module.exports = {
     });
   },
 
-  
+  authenticate: async (req, res, next) => {
+    try {
+      let { id } = req.params;
+
+      let user = await prisma.user.findUnique({
+        where: {
+          id: Number(id),
+        },
+        include: {
+          userProfile: true,
+        },
+      });
+
+      if (!user) {
+        return res.status(400).json({
+          status: false,
+          message: 'Bad Request',
+          data: 'No User Found With Id ' + id
+        });
+      }
+
+      res.status(200).json({
+        status: true,
+        message: 'OK',
+        data: user
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+
 };

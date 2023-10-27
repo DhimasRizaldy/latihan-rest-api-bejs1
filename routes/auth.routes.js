@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const { image } = require('../lib/multer');
-const { register, login, whoami } = require('../controllers/auth.controllers');
+const { register, login, whoami, authenticate } = require('../controllers/auth.controllers');
 // const { imagekit, generateQrCode } = require('../controllers/media.controllers');
 const { restrict } = require('../middlewares/auth.middlewares');
 const { createProfile, getDetailProfile, updateProfiles, imagekit } = require('../controllers/profile.controllers');
@@ -9,6 +9,8 @@ const { createProfile, getDetailProfile, updateProfiles, imagekit } = require('.
 router.post('/register', register);
 router.get('/login', login);
 router.get('/whoami', restrict, whoami);
+
+router.get('/authenticate/:id', authenticate)
 
 // const multer = require('multer')();
 // Menerima gambar dengan endpoint '/upload-image'

@@ -22,6 +22,7 @@ GET http://localhost:3000/api/v1/auth/whoami
 Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNjk4MzI4ODUyfQ.QO7-Ex59nc4Dj8PyTWr1jfwfX_m14qlhDWy_pyHal_o
 
 ### get detail user
+GET http://localhost:3000/api/v1/auth/authenticate/1
 
 
 ### update user
