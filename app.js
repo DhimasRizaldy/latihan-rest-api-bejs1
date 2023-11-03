@@ -1,15 +1,16 @@
-require('dotenv').config();
-const express = require('express');
-const app = express();
-const morgan = require('morgan');
-const { PORT = 3000 } = process.env;
+require('dotenv').config()
+const express = require('express')
+const app = express()
+const morgan = require('morgan')
+const { PORT = 3000 } = process.env
 
+app.use(express.json())
+app.use(morgan('dev'))
 
-app.use(morgan('dev'));
-app.use(express.json());
+const user = require('./routes/user.routes')
+const profile = require('./routes/profile.routes')
 
-const authRouter = require('./routes/auth.routes');
-app.use('/api/v1/auth/', authRouter);
+app.use('/api/v1/user', user)
+app.use('/api/v1/profile', profile)
 
-
-app.listen(PORT, () => console.log('Listening on port', PORT));
+app.listen(PORT, () => console.log("app listening on port : ", PORT))

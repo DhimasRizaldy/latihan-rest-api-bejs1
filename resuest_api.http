@@ -1,59 +1,21 @@
 ### Register
-POST http://localhost:3000/api/v1/auth/register
+POST http://localhost:3000/api/v1/user/register
 Content-Type: application/json
 
 {
-  "email": "dtekchannel02@gmail.com",
-  "password": "dimas123",
-  "password_confirmation": "dimas123" 
-}
-
-### Login
-GET http://localhost:3000/api/v1/auth/login
-Content-Type: application/json
-
-{
-  "email": "dtekchannel02@gmail.com",
+  "email": "dimas01@gmail.com",
   "password": "dimas123"
 }
 
-### Whoami
-GET http://localhost:3000/api/v1/auth/whoami
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNjk4MzI4ODUyfQ.QO7-Ex59nc4Dj8PyTWr1jfwfX_m14qlhDWy_pyHal_o
-
-### get detail user
-GET http://localhost:3000/api/v1/auth/authenticate/1
-
-
-### update user
-
-
-### delete user
-
-
-### add profile
-POST http://localhost:3000/api/v1/auth/profile
+### Login
+POST http://localhost:3000/api/v1/user/login
 Content-Type: application/json
 
 {
-  "userId": 1,
-  "first_name": "Dhimas",
-  "last_name": "Rizaldy",
-  "birth_date": "2001-01-02T00:00:00.000Z",
-  "profile_picture": "httahhajs.jpg"
+  "email": "dimas01@gmail.com",
+  "password": "dimas123"
 }
 
-### update profile
-PUT  http://localhost:3000/api/v1/auth/profile/1
-Content-Type: application/json, multipart/form-data
-
-{
-  "userId": 1,
-  "first_name": "Dhimas",
-  "last_name": "Rizaldy",
-  "birth_date": "2001-01-02T00:00:00.000Z",
-  "profile_picture": "httahhajs.jpg"
-}
-
-### get detail profile
-GET http://localhost:3000/api/v1/auth/profile/1
+### authenticate
+GET http://localhost:3000/api/v1/user/authenticate
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiaWF0IjoxNjk5MDQxMDExfQ.nQyQy4fHH5Lfk-vIXLoJDNvcR90xutvJ_Pxgq1AIw5o

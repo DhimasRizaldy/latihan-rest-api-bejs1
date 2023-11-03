@@ -1,4 +1,4 @@
-const { PrismaClient, Prisma } = require('@prisma/client');
+const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const jwt = require('jsonwebtoken');
 const { JWT_SECRET_KEY } = process.env;
@@ -6,6 +6,7 @@ const { JWT_SECRET_KEY } = process.env;
 module.exports = {
   restrict: (req, res, next) => {
     let { authorization } = req.headers;
+
     if (!authorization) {
       return res.status(401).json({
         status: false,
@@ -15,7 +16,8 @@ module.exports = {
       });
     }
 
-    jwt.verify(authorization, JWT_SECRET_KEY, async (err, decode) => {
+    let token = authorization.split(" ")[1]
+    jwt.verify(token || authorization, JWT_SECRET_KEY, async (err, decoded) => {
       if (err) {
         return res.status(401).json({
           status: false,
@@ -25,7 +27,7 @@ module.exports = {
         });
       }
 
-      req.user = await prisma.user.findUnique({ where: { id: decode.id } });
+      req.user = await prisma.user.findUnique({ where: { id: decoded.id } });
       next();
     });
   }

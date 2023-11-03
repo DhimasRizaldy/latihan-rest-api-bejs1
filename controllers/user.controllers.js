@@ -1,38 +1,30 @@
 const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient;
+const prisma = new PrismaClient();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { JWT_SECRET_KEY } = process.env;
 
 module.exports = {
-  // Register
   register: async (req, res, next) => {
     try {
-      // inisialisasi
-      let { email, password, password_confirmation } = req.body;
-      // kondisi
-      if (password != password_confirmation) {
-        return res.status(400).json({
-          status: false,
-          message: 'Bad Request',
-          err: 'please ensure that the password and password confirmation match!',
-          data: null
-        });
-      }
+      let { email, password } = req.body;
 
-      // cek user jika email sudah terdaftar
-      let userExist = await prisma.user.findUnique({ where: { email } });
+      let userExist = await prisma.user.findUnique({
+        where: { email: email }
+      });
+
       if (userExist) {
         return res.status(400).json({
           status: false,
           message: 'Bad Request',
-          err: 'user has already been user!',
+          err: 'Email sudah digunakan!',
           data: null
         });
       }
 
-      // ecryption password (hash)
       let encryptedPassword = await bcrypt.hash(password, 10);
+
+      // Buat entri baru dalam model User
       let user = await prisma.user.create({
         data: {
           email,
@@ -40,9 +32,23 @@ module.exports = {
         }
       });
 
+      // Dapatkan ID dari entri yang baru dibuat
+      const idUser = user.id;
+
+      // Buat entri dalam model UserProfile dengan ID yang telah didapatkan
+      await prisma.userProfile.create({
+        data: {
+          idUser: idUser,
+          first_name: null,
+          last_name: null,
+          birth_data: null,
+          profile_picture: null
+        }
+      });
+
       return res.status(201).json({
         status: true,
-        message: 'Create User Susccessfuly!',
+        message: 'Dibuat',
         err: null,
         data: { user }
       });
@@ -51,17 +57,16 @@ module.exports = {
     }
   },
 
-  // Login
   login: async (req, res, next) => {
     try {
       let { email, password } = req.body;
 
-      let user = await prisma.user.findUnique({ where: { email } });
+      let user = await prisma.user.findUnique({ where: { email }, });
       if (!user) {
         return res.status(400).json({
           status: false,
           message: 'Bad Request',
-          err: 'Invalid email or password!',
+          err: 'invalid email or password!',
           data: null
         });
       }
@@ -71,7 +76,7 @@ module.exports = {
         return res.status(400).json({
           status: false,
           message: 'Bad Request',
-          err: 'Invalid email or password!',
+          err: 'invalid email or password!',
           data: null
         });
       }
@@ -86,48 +91,21 @@ module.exports = {
       });
     } catch (err) {
       next(err);
+
     }
   },
-
-  whoami: (req, res, next) => {
-    return res.status(200).json({
-      status: true,
-      message: 'OK',
-      err: null,
-      data: { user: req.user }
-    });
-  },
-
   authenticate: async (req, res, next) => {
     try {
-      let { id } = req.params;
-
-      let user = await prisma.user.findUnique({
-        where: {
-          id: Number(id),
-        },
-        include: {
-          userProfile: true,
-        },
-      });
-
-      if (!user) {
-        return res.status(400).json({
-          status: false,
-          message: 'Bad Request',
-          data: 'No User Found With Id ' + id
-        });
-      }
-
-      res.status(200).json({
+      const user = req.user;
+      const profileUser = await prisma.userProfile.findUnique({ where: { idUser: user.id, }, });
+      return res.status(200).json({
         status: true,
-        message: 'OK',
-        data: user
+        message: "OK",
+        err: null,
+        data: { user: { ...profileUser, email: user.email } },
       });
     } catch (err) {
       next(err);
     }
   }
-
-
-};
+}

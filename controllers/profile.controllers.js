@@ -1,114 +1,74 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
-const imagekit = require('../lib/imagekit');
-const multer = require("../lib/multer");
+const imageKit = require('../libs/imagekit');
 const path = require('path');
 
 module.exports = {
-  createProfile: async (req, res, next) => {
-    try {
-      const { userId, first_name, last_name, birth_date } = req.body;
-
-      const strFile = req.file.buffer.toString('base64');
-
-      const { url } = await imagekit.upload({
-        fileName: Date.now() + path.extname(req.file.originalname),
-        file: strFile,
-      });
-
-      // Sekarang, kami akan mengintegrasikan URL gambar ke profil pengguna.
-      const newProfile = await prisma.userProfile.create({
-        data: {
-          userId,
-          first_name,
-          last_name,
-          birth_date,
-          profile_picture: url, // Menyimpan URL gambar sebagai tipe String
-        },
-      });
-
-      res.status(201).json({
-        status: true,
-        message: "Profil berhasil dibuat!",
-        data: newProfile,
-      });
-    } catch (err) {
-      next(err);
-    }
-  },
-
-  imagekit: async (req, res, next) => {
-    try {
-      const strFile = req.file.buffer.toString('base64');
-
-      const { url } = await imagekit.upload({
-        fileName: Date.now() + path.extname(req.file.originalname),
-        file: strFile,
-      });
-
-      return res.json({
-        status: true,
-        message: 'OK',
-        error: null,
-        data: { profile_picture: url } // Menyimpan URL gambar dalam respons
-      });
-    } catch (err) {
-      next(err);
-    }
-  },
-
-
-  // get profiles detal by: id
-  getDetailProfile: async (req, res, next) => {
+  // update profile
+  updateProfile: async (req, res, next) => {
     try {
       let { id } = req.params;
-      let profiles = await prisma.userProfile.findUnique({
-        where: { id: Number(id) }
-      });
+      let { idUser, first_name, last_name, birth_date } = req.body;
+      idUser = Number(idUser);
+      let strFile = req.file.buffer.toString('base64');
 
-      if (!profiles) {
+      let profileExist = await prisma.userProfile.findUnique({ where: { id: Number(id) } });
+      if (!profileExist) {
         return res.status(400).json({
           status: false,
           message: 'Bad Request',
-          data: 'No Profiles Found With Id ' + id
+          err: 'profile not found!',
+          data: null
+        });
+      }
+      let idUserExist = await prisma.user.findUnique({ where: { id: Number(id) } });
+      if (!idUserExist) {
+        return res.status(400).json({
+          status: false,
+          message: 'Bad Request',
+          err: 'idUser not found!',
+          data: null
         });
       }
 
-      res.status(200).json({
-        status: true,
-        message: 'Details Profiles',
-        data: profiles
+      // Simpan URL `profile_picture` lama
+      const oldProfilePictureURL = profileExist.profile_picture;
+
+      // Hapus foto lama dari ImageKit jika ada
+      if (oldProfilePictureURL) {
+        imageKit.deleteFile(oldProfilePictureURL, function (error, result) {
+          if (error) {
+            console.log('Gagal menghapus foto lama:', error);
+          } else {
+            console.log('Berhasil menghapus foto lama:', result);
+          }
+        });
+      }
+
+      let { url } = await imageKit.upload({
+        fileName: Date.now() + path.extname(req.file.originalname),
+        file: strFile
       });
-    } catch (err) {
-      next(err);
-    }
-  },
 
-  // update data profiles
-  updateProfiles: async (req, res, next) => {
-    try {
-      let { id } = req.params;
-      let { userId, first_name, last_name, birth_date, profile_picture } = req.body;
-
-      let updateOperation = await prisma.userProfile.update({
-        where: { id: Number(id) },
+      let updateProfile = await prisma.userProfile.update({
+        where: { idUser: Number(id) },
         data: {
-          userId,
           first_name,
           last_name,
           birth_date,
-          profile_picture
+          profile_picture: url
         }
       });
 
-      res.status(200).json({
+      return res.status(200).json({
         status: true,
-        message: 'Updated Profiles Successfuly!',
-        data: updateOperation
+        message: 'Profile Updated!',
+        err: null,
+        data: { updateProfile }
       });
+
     } catch (err) {
       next(err);
     }
   }
-
-};
+}

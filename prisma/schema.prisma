@@ -12,19 +12,18 @@ datasource db {
 
 // User
 model User {
-  id          Int          @id @default(autoincrement())
-  email       String       @unique
-  password    String
-  userProfile UserProfile?
+  id       Int          @id @default(autoincrement())
+  email    String       @unique
+  password String
+  profile  UserProfile?
 }
 
-// profile
 model UserProfile {
-  id              Int      @id @default(autoincrement())
-  userId          Int      @unique
+  id              Int    @id @default(autoincrement())
+  idUser          Int    @unique
   first_name      String
   last_name       String
-  birth_date      DateTime
+  birth_date      String
   profile_picture String
-  user            User     @relation(fields: [userId], references: [id])
+  user            User   @relation(fields: [idUser], references: [id])
 }
